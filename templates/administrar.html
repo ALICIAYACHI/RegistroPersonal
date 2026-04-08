@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Registros</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Administrar Registros</h1>
+
+        <a href="/" class="administrar-link">&#8592; Volver al Registro</a>
+        <div class="separator"></div>
+
+        {% if registros %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for persona in registros %}
+                <tr>
+                    <td>{{ persona[0] }}</td>
+                    <td>{{ persona[1] }}</td>
+                    <td>{{ persona[2] }}</td>
+                    <td>{{ persona[3] }}</td>
+                    <td>{{ persona[4] }}</td>
+                    <td>{{ persona[5] }}</td>
+                    <td>
+                        <form action="/eliminar/{{ persona[1] }}" method="post"
+                              onsubmit="return confirmarEliminar('{{ persona[2] }} {{ persona[3] }}')">
+                            <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="sin-registros">No hay registros en la base de datos.</p>
+        {% endif %}
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="modalConfirm" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cancelarEliminar()">&times;</span>
+            <p id="modalMensaje">¿Estás seguro de que deseas eliminar este registro?</p>
+            <div class="modal-buttons">
+                <button onclick="aceptarEliminar()" class="btn-confirmar">Sí, eliminar</button>
+                <button onclick="cancelarEliminar()" class="btn-cancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formPendiente = null;
+
+        function confirmarEliminar(nombreCompleto) {
+            document.getElementById('modalMensaje').textContent =
+                '¿Estás seguro de que deseas eliminar a ' + nombreCompleto + '?';
+            document.getElementById('modalConfirm').style.display = 'block';
+            // Guardamos el form que disparó el evento
+            formPendiente = event.target;
+            return false; // Evitamos el envío inmediato
+        }
+
+        function aceptarEliminar() {
+            document.getElementById('modalConfirm').style.display = 'none';
+            if (formPendiente) {
+                formPendiente.submit();
+            }
+        }
+
+        function cancelarEliminar() {
+            document.getElementById('modalConfirm').style.display = 'none';
+            formPendiente = null;
+        }
+    </script>
+</body>
+</html>
