@@ -6,19 +6,16 @@ import os
 app = Flask(__name__, template_folder='templates')
 
 # Configuración de la base de datos
-DB_HOST = 'dpg-cr6bdj1u0jms73bn1teg-a.oregon-postgres.render.com'
-DB_NAME = 'dbtest_h0hy'
-DB_USER = 'dbtest_h0hy_user'
-DB_PASSWORD = 'xkmD4V6rmoGNJ27uGLq1k76ynORQ8HTd'
+DB_HOST = 'dpg-d7b86s6a2pns7380svd0-a.oregon-postgres.render.com'
+DB_NAME = 'dbtest_qvxx'
+DB_USER = 'dbtest_qvxx_user'
+DB_PASSWORD = '8RFEYN71iZe2hrYlkMUE9C2pxei7OYjX'
 
 
 def conectar_db():
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
-        return conn
-    except psycopg2.Error as e:
-        print("Error al conectar a la base de datos:", e)
+    conn = psycopg2.connect(
+        dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+    return conn
 
 
 def crear_persona(dni, nombre, apellido, direccion, telefono):
@@ -30,8 +27,7 @@ def crear_persona(dni, nombre, apellido, direccion, telefono):
     conn.close()
 
 def obtener_registros():
-    conn = psycopg2.connect(
-        dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+    conn = conectar_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personas ORDER BY apellido")
     registros = cursor.fetchall()
@@ -50,8 +46,7 @@ def registrar():
     direccion = request.form['direccion']
     telefono = request.form['telefono']
     crear_persona(dni, nombre, apellido, direccion, telefono)
-    mensaje_confirmacion = "Registro Exitoso"
-    return redirect(url_for('index', mensaje_confirmacion=mensaje_confirmacion))
+    return redirect(url_for('index'))
 
 @app.route('/administrar')
 def administrar():
@@ -60,8 +55,7 @@ def administrar():
 
 @app.route('/eliminar/<dni>', methods=['POST'])
 def eliminar_registro(dni):
-    conn = psycopg2.connect(
-        dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+    conn = conectar_db()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM personas WHERE dni = %s", (dni,))
     conn.commit()
